@@ -1,0 +1,54 @@
+data:
+  image: ubuntu:14.04
+  volumes:
+    - ../redis-data:/data
+    - ../logs:/var/log
+    - /etc/localtime:/etc/localtime:ro
+    - ../www:/host_www
+    - ../nginx:/host_nginx:ro
+    - ../bin:/host_bin:ro
+
+redis:
+  restart: on-failure:10
+  image: dockerfile/redis:latest
+  volumes_from:
+    - data
+
+rtmp:
+  restart: on-failure:10
+  image: astele/camdev-nginx-rtmp:cron
+  command: /sbin/my_init
+  links:
+    - web:python
+  ports:
+    - "8091:8091"
+    - "1935:1935"
+  volumes_from:
+    - data
+
+worker:
+  restart: on-failure:10
+  build: ./worker
+  command: celery -A tasks worker --loglevel=info --beat --autoreload --logfile="/var/log/celery/%n.log"
+  links:
+    - redis
+    - rtmp
+  volumes:
+    - .:/src
+  volumes_from:
+    - data
+    - rtmp
+
+web:
+  restart: on-failure:10
+  build: .
+#  command: python /src/mediaserver.py
+  command: /usr/local/bin/gunicorn -w 2 -b :5011 -k gevent --reload --error-logfile /var/log/gunicorn.log mediaserver:app
+  links:
+    - redis
+  expose:
+    - "5011"
+  volumes:
+    - .:/src
+  volumes_from:
+    - data
