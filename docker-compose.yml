@@ -38,6 +38,8 @@ worker:
   volumes_from:
     - data
     - rtmp
+  env_file:
+    - ./common.env
 
 web:
   restart: on-failure:10
@@ -52,3 +54,5 @@ web:
     - .:/src
   volumes_from:
     - data
+  env_file:
+    - ./common.env

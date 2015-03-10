@@ -3,3 +3,4 @@ redis
 gunicorn
 gevent
 celery[redis]
+subprocess32

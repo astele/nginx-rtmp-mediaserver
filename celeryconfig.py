@@ -15,15 +15,15 @@ CELERYBEAT_SCHEDULE = {
         'schedule': crontab(minute='*/1'),
     },
     'daily-clean-media': {
-        'task': 'tasks.clean_stale_media',
+        'task': 'tasks.clean-stale-media',
         'schedule': crontab(hour=8, minute=23),
     },
     'hourly-clean-tmp': {
-        'task': 'tasks.clean_tmp',
+        'task': 'tasks.clean-tmp-media',
         'schedule': crontab(minute=3),
     },
     'hourly-extract-preview': {
-        'task': 'tasks.extract_preview',
+        'task': 'tasks.extract-video-preview',
         'schedule': crontab(minute=5),
     },
 }
