@@ -24,6 +24,22 @@ def point_webcam_list(site, spid=None):
     #                 mimetype="application/json")
 
 
+@app.route('/api/archive_hours/<site>/<webcam>/<rec_date>/')
+def hours_by_date(site, webcam, rec_date):
+    res = []
+    try:
+        date = datetime.strptime(rec_date, '%Y-%m-%d').date()
+        res = redis.zrange(
+            'hours:{site}:{webcam}:{date:%d-%m-%Y}'.format(
+                site=site, webcam=webcam, date=date
+            ), 0, -1
+        )
+    except ValueError:
+        abort(400, u'Incorrect date format')
+
+    return jsonify(result=res)
+
+
 @app.route('/api/points_by_date/<site>/<rec_date>/')
 def points_by_date(site, rec_date):
     res = []
@@ -34,6 +50,7 @@ def points_by_date(site, rec_date):
         )
     except ValueError:
         abort(400, u'Incorrect date format')
+
     return jsonify(result=list(res))
 
 if __name__ == '__main__':

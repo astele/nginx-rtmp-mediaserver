@@ -10,6 +10,10 @@ CELERYBEAT_SCHEDULE = {
         'task': 'tasks.parse-archive-dates',
         'schedule': crontab(minute='*/1'),
     },
+    'every-minute-hours': {
+        'task': 'tasks.parse-archive-hours',
+        'schedule': crontab(minute='*/1'),
+    },
     'every-minute-records_2': {
         'task': 'tasks.parse-records-by-date',
         'schedule': crontab(minute='*/1'),

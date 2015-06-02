@@ -29,7 +29,7 @@ def parse_file_names():
 
 @celery.task(name='tasks.parse-archive-dates')
 def parse_archive_dates():
-    logger.info('Parse hourly archives task')
+    logger.info('Parse archive dates task')
     date_keys = r.keys('dates:*')
     pipe = r.pipeline(transaction=True)
     for key in date_keys:
@@ -44,6 +44,25 @@ def parse_archive_dates():
 
     pipe.execute(raise_on_error=True)
 
+@celery.task(name='tasks.parse-archive-hours')
+def parse_archive_hours():
+    logger.info('Parse archive hours task')
+    hour_keys = r.keys('hours:*')
+    pipe = r.pipeline(transaction=True)
+    for key in hour_keys:
+        pipe.delete(key)
+
+    for d in parse_file_names():
+        try:
+            pipe.zadd(
+                'hours:{site}:{webcam}:{rec_date}'.format(
+                    site=d[0], webcam=d[2], rec_date=d[3]
+                ), d[4], 0
+            )
+        except IndexError, e:
+            logger.warn('Parsing archive hours error: {}: {}'.format('_'.join(d), e.message))
+
+    pipe.execute(raise_on_error=True)
 
 @celery.task(name='tasks.parse-records-by-date')
 def parse_records_by_date():
