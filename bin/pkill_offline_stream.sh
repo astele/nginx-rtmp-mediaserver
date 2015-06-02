@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # "timeout" for OS X (from https://gist.github.com/jaytaylor/6527607)
-function timeout() { perl -e 'alarm shift; exec @ARGV' "$@"; }
+# function timeout() { perl -e 'alarm shift; exec @ARGV' "$@"; }
 
 st=0;
 while [ $st -lt 6 ];
